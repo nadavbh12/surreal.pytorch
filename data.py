@@ -19,7 +19,7 @@ from torchvision.transforms.functional import to_tensor
 
 from utils.dataset import DuplicateBatchSampler
 from utils.regime import Regime
-from utils.img_utils import crop
+from img_utils import crop
 from preprocess import get_transform
 
 __DATASETS_DEFAULT_PATH = '/home/ANT.AMAZON.COM/nadavb/datasets'

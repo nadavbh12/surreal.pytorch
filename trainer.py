@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.parallel
 from torch.nn.utils import clip_grad_norm_
 from utils.meters import AverageMeter, accuracy
-from utils.img_utils import iou, pixel_accuracy
+from img_utils import iou, pixel_accuracy
 
 
 class Trainer(object):
