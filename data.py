@@ -4,6 +4,7 @@ import random
 import math
 import logging
 
+import numpy as np
 import scipy.io as sio
 from PIL import Image
 import imageio
@@ -75,7 +76,10 @@ def get_dataset(name, split='train', transform=None,
 
 
 joints_idx_tmp = [8, 5, 2, 3, 6, 9, 1, 7, 13, 16, 21, 19, 17, 18, 20, 22]
-JOINTS_IDX = [i + 1 for i in joints_idx_tmp]
+JOINTS_IDX = [i - 1 for i in joints_idx_tmp]
+
+smpl_2_segm = [0, 2, 12, 9, 2, 13, 10, 2, 14, 11, 2, 14, 11, 2, 2, 2, 1, 6, 3, 7, 4, 8, 5, 8, 5]
+# SEGM_2_IDX = [0] + list(map(lambda x: x - 1, smpl_2_segm))
 
 
 class BadImageError(Exception):
@@ -137,7 +141,7 @@ class Cmu(data.Dataset):
 
             return img, label
 
-        except BadImageError as e:
+        except (BadImageError, TypeError) as e:
             logging.debug(e)
 
     @staticmethod
@@ -161,16 +165,15 @@ class Cmu(data.Dataset):
         if len(segm.nonzero()) == 0:
             raise BadImageError('no segmentation available')
         # merge body parts
-        segm = Cmu.change_segm_idx(segm,
-                                   [2, 12, 9, 2, 13, 10, 2, 14, 11, 2, 14,
-                                    11, 2, 2, 2, 1, 6, 3, 7, 4, 8, 5, 8, 5])
-        return segm
+        segm2 = Cmu.change_segm_idx(segm, smpl_2_segm)
+        return segm2
 
     @staticmethod
     def change_segm_idx(segm, s):
+        out = np.zeros_like(segm)
         for i in range(len(s)):
-            segm[segm == i] = s[i]
-        return segm
+            out[segm == i] = s[i]
+        return out
 
     @staticmethod
     def get_tight_box(label):

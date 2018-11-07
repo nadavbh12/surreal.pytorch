@@ -9,12 +9,13 @@ import torch
 from torchvision.transforms import functional as F
 
 
-""" Random """
 def randn():
     return random.gauss(0, 1)
 
+
 def rand():
     return random.random()
+
 
 def rnd(x):
     '''umich hourglass mpii random function'''
@@ -226,7 +227,7 @@ def crop(img, center, scale, rot, res, method):
 
 def iou(pred, target, n_classes=12):
     ious = []
-    pred = pred.max(dim=1)[0].view(-1)
+    pred = pred.max(dim=1)[1].view(-1)
     target = target.view(-1)
 
     # Ignore IoU for background class ("0")
@@ -244,11 +245,21 @@ def iou(pred, target, n_classes=12):
     return ious.mean()
 
 
-def pixel_accuracy(pred, target):
+def pixel_accuracy(pred, target, n_classes=12):
+    """
+    accuracy is calculated per image per class and then averaged.
+    Background class is ignored
+    """
     pred = pred.max(dim=1)[1]
+    batch_size = target.shape[0]
 
-    batch_size = pred.shape[0]
-    n_pixels = target.numel() // batch_size
-    correct = (pred == target).sum().item()
-    accuracy = (correct / n_pixels)
-    return accuracy
+    correct_per_class_normalized = target.new_empty((batch_size, n_classes)).float()
+    for b, (p, t) in enumerate(zip(pred, target)):
+        for i in range(n_classes):
+            n_pixels_per_class = (t == i).sum()
+            correct_per_class = ((p == t) * (t == i)).sum()
+            correct_per_class_normalized[b, i] = correct_per_class.float() / n_pixels_per_class.float() \
+                if n_pixels_per_class else 0
+
+    accuracy = correct_per_class_normalized[:, 1:].mean()
+    return accuracy.item()

@@ -90,6 +90,8 @@ parser.add_argument('--seed', default=123, type=int,
 
 parser.add_argument('--joints_idx', default=[8, 5, 2, 3, 6, 9, 1, 7, 13, 16, 21, 19, 17, 18, 20, 22],
                     help='Joint idx')
+parser.add_argument('--stacks', default=8,
+                    help='Number of stacks in Hourglass network')
 
 
 def main():
@@ -258,10 +260,10 @@ def main():
                      legend=['training', 'validation'],
                      title='Loss', ylabel='loss')
         results.plot(x='epoch', y=['training pixel_accuracy', 'validation pixel_accuracy'],
-                     legend=['training', 'pixel_accuracy'],
+                     legend=['training', 'validation'],
                      title='pixel accuracy', ylabel='error %')
         results.plot(x='epoch', y=['training iou', 'validation iou'],
-                     legend=['training', 'iou'],
+                     legend=['training', 'validation'],
                      title='IOU', ylabel='iou %')
         if 'grad' in train_results.keys():
             results.plot(x='epoch', y=['training grad'],

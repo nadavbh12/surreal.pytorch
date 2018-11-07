@@ -6,6 +6,7 @@ import torch.nn.parallel
 from torch.nn.utils import clip_grad_norm_
 from utils.meters import AverageMeter, accuracy
 from img_utils import iou, pixel_accuracy
+import matplotlib.pyplot as plt
 
 
 class Trainer(object):
@@ -116,8 +117,9 @@ class Trainer(object):
 
             if num_steps is not None and i >= num_steps:
                 break
-            # if i % 20 == 0:
-            #     break
+            # if i % 200 == 0:
+            #     plt.imshow(target[0]); plt.show()
+            #     plt.imshow(output[0].max(dim=0)[1]); plt.show()
 
         return meter_results(meters)
 
