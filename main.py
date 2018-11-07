@@ -24,74 +24,86 @@ model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
                      and callable(models.__dict__[name]))
 
-parser = argparse.ArgumentParser(description='PyTorch ConvNet Training')
+parser = argparse.ArgumentParser(description='PyTorch Surreal Training')
 
-parser.add_argument('--results-dir', metavar='RESULTS_DIR', default='./results',
-                    help='results dir')
-parser.add_argument('--save', metavar='SAVE', default='',
-                    help='saved folder')
-parser.add_argument('--dataset', metavar='DATASET', default='imagenet',
-                    help='dataset name or folder')
-parser.add_argument('--model', '-a', metavar='MODEL', default='alexnet',
-                    choices=model_names,
-                    help='model architecture: ' +
-                    ' | '.join(model_names) +
-                    ' (default: alexnet)')
-parser.add_argument('--input-size', type=int, default=None,
-                    help='image input size')
-parser.add_argument('--model-config', default='',
-                    help='additional architecture configuration')
-parser.add_argument('--dtype', default='float',
-                    help='type of tensor: ' +
-                    ' | '.join(torch_dtypes.keys()) +
-                    ' (default: float)')
-parser.add_argument('--device', default='cuda',
-                    help='device assignment ("cpu" or "cuda")')
-parser.add_argument('--device-ids', default=[0], type=int, nargs='+',
-                    help='device ids assignment (e.g 0 1 2 3')
-parser.add_argument('--world-size', default=-1, type=int,
-                    help='number of distributed processes')
-parser.add_argument('--local_rank', default=-1, type=int,
-                    help='rank of distributed processes')
-parser.add_argument('--dist-init', default='env://', type=str,
-                    help='init used to set up distributed training')
-parser.add_argument('--dist-backend', default='nccl', type=str,
-                    help='distributed backend')
-parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
-                    help='number of data loading workers (default: 8)')
-parser.add_argument('--epochs', default=90, type=int, metavar='N',
-                    help='number of total epochs to run')
-parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
-                    help='manual epoch number (useful on restarts)')
-parser.add_argument('-b', '--batch-size', default=256, type=int,
-                    metavar='N', help='mini-batch size (default: 256)')
-parser.add_argument('--eval-batch-size', default=-1, type=int,
-                    help='mini-batch size (default: same as training)')
-parser.add_argument('--optimizer', default='SGD', type=str, metavar='OPT',
-                    help='optimizer function used')
-parser.add_argument('--label-smoothing', default=0, type=float,
-                    help='label smoothing coefficient - default 0')
-parser.add_argument('--grad-clip', default=-1, type=float,
-                    help='maximum grad norm value, -1 for none')
-parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
-                    metavar='LR', help='initial learning rate')
-parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
-                    help='momentum')
-parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float,
-                    metavar='W', help='weight decay (default: 1e-4)')
-parser.add_argument('--print-freq', '-p', default=10, type=int,
-                    metavar='N', help='print frequency (default: 10)')
-parser.add_argument('--resume', default='', type=str, metavar='PATH',
-                    help='path to latest checkpoint (default: none)')
-parser.add_argument('-e', '--evaluate', type=str, metavar='FILE',
-                    help='evaluate model FILE on validation set')
-parser.add_argument('--seed', default=123, type=int,
-                    help='random seed (default: 123)')
+logging_parser = parser.add_argument_group('Logging Parameters')
+logging_parser.add_argument('--results-dir', metavar='RESULTS_DIR', default='./results',
+                            help='results dir')
+logging_parser.add_argument('--save', metavar='SAVE', default='',
+                            help='saved folder')
+logging_parser.add_argument('--print-freq', '-p', default=10, type=int,
+                            metavar='N', help='print frequency (default: 10)')
 
-parser.add_argument('--joints_idx', default=[8, 5, 2, 3, 6, 9, 1, 7, 13, 16, 21, 19, 17, 18, 20, 22],
-                    help='Joint idx')
-parser.add_argument('--stacks', default=8,
-                    help='Number of stacks in Hourglass network')
+training_parser = parser.add_argument_group('Training Parameters')
+training_parser.add_argument('--dtype', default='float',
+                             help='type of tensor: ' +
+                                  ' | '.join(torch_dtypes.keys()) +
+                                  ' (default: float)')
+training_parser.add_argument('--device', default='cuda',
+                             help='device assignment ("cpu" or "cuda")')
+training_parser.add_argument('--device-ids', default=[0], type=int, nargs='+',
+                             help='device ids assignment (e.g 0 1 2 3')
+training_parser.add_argument('--world-size', default=-1, type=int,
+                             help='number of distributed processes')
+training_parser.add_argument('--local_rank', default=-1, type=int,
+                             help='rank of distributed processes')
+training_parser.add_argument('--dist-init', default='env://', type=str,
+                             help='init used to set up distributed training')
+training_parser.add_argument('--dist-backend', default='nccl', type=str,
+                             help='distributed backend')
+training_parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
+                             help='number of data loading workers (default: 8)')
+training_parser.add_argument('--epochs', default=90, type=int, metavar='N',
+                             help='number of total epochs to run')
+training_parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
+                             help='manual epoch number (useful on restarts)')
+training_parser.add_argument('-b', '--batch-size', default=6, type=int,
+                             metavar='N', help='mini-batch size (default: 256)')
+training_parser.add_argument('--eval-batch-size', default=-1, type=int,
+                             help='mini-batch size (default: same as training)')
+training_parser.add_argument('--label-smoothing', default=0, type=float,
+                             help='label smoothing coefficient - default 0')
+training_parser.add_argument('--seed', default=123, type=int,
+                             help='random seed (default: 123)')
+
+data_parser = parser.add_argument_group('Data Parameters')
+data_parser.add_argument('--dataset', metavar='DATASET', default='cmu_segm',
+                         help='dataset name or folder')
+data_parser.add_argument('--resume', default='', type=str, metavar='PATH',
+                         help='path to latest checkpoint (default: none)')
+data_parser.add_argument('-e', '--evaluate', type=str, metavar='FILE',
+                         help='evaluate model FILE on validation set')
+data_parser.add_argument('--joints_idx', default=[8, 5, 2, 3, 6, 9, 1, 7, 13, 16, 21, 19, 17, 18, 20, 22],
+                         help='Joint idx')
+
+model_parser = parser.add_argument_group('Model Parameters')
+model_parser.add_argument('--model', '-a', metavar='MODEL', default='alexnet',
+                          choices=model_names,
+                          help='model architecture: ' +
+                               ' | '.join(model_names) +
+                               ' (default: alexnet)')
+model_parser.add_argument('--input-size', type=int, default=None,
+                          help='image input size')
+model_parser.add_argument('--model-config', default='',
+                          help='additional architecture configuration')
+training_parser.add_argument('--stacks', default=8,
+                             help='Number of stacks in Hourglass network')
+
+optim_parser = parser.add_argument_group('Optimization Parameters')
+optim_parser.add_argument('--optimizer', default='RMSprop', type=str, metavar='OPT',
+                          help='optimizer function used')
+optim_parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
+                          metavar='LR', help='initial learning rate')
+optim_parser.add_argument('--grad-clip', default=-1, type=float,
+                          help='maximum grad norm value, -1 for none')
+optim_parser.add_argument('--momentum', default=0.0, type=float, metavar='M',
+                          help='momentum')
+optim_parser.add_argument('--weight-decay', '--wd', default=0.0, type=float,
+                          metavar='W', help='weight decay (default: 1e-4)')
+optim_parser.add_argument('--alpha', default=0.99, type=float,
+                          metavar='ALPHA', help='alpha for rmsprop (default: 0.99)')
+optim_parser.add_argument('--epsilon', default=1e-8, type=float,
+                          metavar='EPS', help='epsilon for rmsprop (default: 1e-8)')
 
 
 def main():
@@ -183,7 +195,9 @@ def main():
                                               'optimizer': args.optimizer,
                                               'lr': args.lr,
                                               'momentum': args.momentum,
-                                              'weight_decay': args.weight_decay}])
+                                              'weight_decay': args.weight_decay,
+                                              'alpha': args.alpha,
+                                              'epsilon': args.epsilon}])
 
     optimizer = OptimRegime(model.parameters(), optim_regime)
 
@@ -208,7 +222,7 @@ def main():
     # Training Data loading code
     train_data = DataRegime(getattr(model, 'data_regime', None),
                             defaults={'name': args.dataset, 'split': 'train', 'augment': True,
-                                      'input_size': args.input_size,  'batch_size': args.batch_size, 'shuffle': True,
+                                      'input_size': args.input_size, 'batch_size': args.batch_size, 'shuffle': True,
                                       'num_workers': args.workers, 'pin_memory': True, 'drop_last': True,
                                       'collate_fn': ignore_exceptions_collate,
                                       'distributed': args.distributed, })
