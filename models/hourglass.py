@@ -173,8 +173,8 @@ class HourglassNet(nn.Module):
 
 
 def hourglass(**kwargs):
-    num_classes = getattr(kwargs, 'num_classes', 15)
+    n_classes = getattr(kwargs, 'n_classes', 15)
     n_stacks = kwargs.get('n_stacks', 8)
-    n_feats = kwargs.get('num_classes', 256)
+    n_feats = kwargs.get('n_features', 256)
     n_modules = kwargs.get('n_modules', 1)
-    return HourglassNet(nStacks=n_stacks, nModules=n_modules, nFeat=n_feats, nClasses=num_classes)
+    return HourglassNet(nStacks=n_stacks, nModules=n_modules, nFeat=n_feats, nClasses=n_classes)

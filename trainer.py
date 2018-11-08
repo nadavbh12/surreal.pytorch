@@ -74,8 +74,6 @@ class Trainer(object):
 
         def meter_results(meters):
             results = {name: meter.avg for name, meter in meters.items()}
-            results['pixel_accuracy'] = 100. - results['pixel_accuracy']
-            # results['error5'] = 100. - results['prec5']
             return results
 
         end = time.time()
