@@ -30,39 +30,7 @@ def get_dataset(name, split='train', transform=None,
                 target_transform=None, download=True, datasets_path=__DATASETS_DEFAULT_PATH):
     train = (split == 'train')
     root = os.path.join(datasets_path, name)
-    if name == 'cifar10':
-        return datasets.CIFAR10(root=root,
-                                train=train,
-                                transform=transform,
-                                target_transform=target_transform,
-                                download=download)
-    elif name == 'cifar100':
-        return datasets.CIFAR100(root=root,
-                                 train=train,
-                                 transform=transform,
-                                 target_transform=target_transform,
-                                 download=download)
-    elif name == 'mnist':
-        return datasets.MNIST(root=root,
-                              train=train,
-                              transform=transform,
-                              target_transform=target_transform,
-                              download=download)
-    elif name == 'stl10':
-        return datasets.STL10(root=root,
-                              split=split,
-                              transform=transform,
-                              target_transform=target_transform,
-                              download=download)
-    elif name == 'imagenet':
-        if train:
-            root = os.path.join(root, 'train')
-        else:
-            root = os.path.join(root, 'val')
-        return datasets.ImageFolder(root=root,
-                                    transform=transform,
-                                    target_transform=target_transform)
-    elif name == 'cmu_segm':
+    if name == 'cmu_segm':
         root = os.path.join(root.rsplit('/', 1)[0], 'SURREAL/data/cmu', )
         if train:
             root = os.path.join(root, 'train')
@@ -79,7 +47,6 @@ joints_idx_tmp = [8, 5, 2, 3, 6, 9, 1, 7, 13, 16, 21, 19, 17, 18, 20, 22]
 JOINTS_IDX = [i - 1 for i in joints_idx_tmp]
 
 smpl_2_segm = [0, 2, 12, 9, 2, 13, 10, 2, 14, 11, 2, 14, 11, 2, 2, 2, 1, 6, 3, 7, 4, 8, 5, 8, 5]
-# SEGM_2_IDX = [0] + list(map(lambda x: x - 1, smpl_2_segm))
 
 
 class BadImageError(Exception):
